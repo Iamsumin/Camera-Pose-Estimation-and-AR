@@ -16,7 +16,7 @@ video = cv.VideoCapture(video_file)
 assert video.isOpened(), 'Cannot read the given input, ' + video_file
 
 # Prepare a 3D box for simple AR
-box_lower = board_cellsize * np.array([
+A_lower = board_cellsize * np.array([
     [2.0, 5.0, 0.0],  
     [2.5, 3.0, 0.0], 
     [3.5, 3.0, 0.0],  
@@ -25,8 +25,8 @@ box_lower = board_cellsize * np.array([
     [3.3, 4.0, 0.0],  
 ], dtype=np.float32)
 
-box_upper = box_lower.copy()
-box_upper[:, 2] = -0.075  
+A_upper = A_lower.copy()
+A_upper[:, 2] = -0.075  
 
 # Prepare 3D points on a chessboard
 obj_points = board_cellsize * np.array([[c, r, 0] for r in range(board_pattern[1]) for c in range(board_pattern[0])])
@@ -44,8 +44,8 @@ while True:
         ret, rvec, tvec = cv.solvePnP(obj_points, img_points, K, dist_coeff)
 
         # Draw the box on the image
-        line_lower, _ = cv.projectPoints(box_lower, rvec, tvec, K, dist_coeff)
-        line_upper, _ = cv.projectPoints(box_upper, rvec, tvec, K, dist_coeff)
+        line_lower, _ = cv.projectPoints(A_lower, rvec, tvec, K, dist_coeff)
+        line_upper, _ = cv.projectPoints(A_upper, rvec, tvec, K, dist_coeff)
         cv.polylines(img, [np.int32(line_lower)], True, (255, 0, 0), 2)
         cv.polylines(img, [np.int32(line_upper)], True, (0, 0, 255), 2)
         for b, t in zip(line_lower, line_upper):
